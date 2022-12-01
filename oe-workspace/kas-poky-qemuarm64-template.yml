@@ -1,0 +1,55 @@
+header:
+  version: 11
+
+machine: qemuarm64
+distro: poky
+target: core-image-minimal
+
+defaults:
+  repos:
+    refspec: ${BRANCH}
+
+repos:
+  poky:
+    url: https://git.yoctoproject.org/git/poky
+    layers:
+      meta:
+      meta-poky:
+
+  meta-openembedded:
+    url: https://git.openembedded.org/meta-openembedded
+    path: poky/meta-openembedded
+    layers:
+      meta-oe:
+      meta-python:
+
+  meta-arm:
+    url: https://git.yoctoproject.org/meta-arm
+    path: poky/meta-arm
+    layers:
+      meta-arm:
+      meta-arm-toolchain:
+
+  meta-clang:
+    url: https://github.com/kraj/meta-clang
+    path: poky/meta-clang
+    refspec: ${META_CLANG_BRANCH}
+
+  ci-box:
+    layers:
+      meta-ci-box:
+
+local_conf_header:
+  setup: |
+    # Conserve disk space
+    INHERIT += "rm_work"
+
+    # Share the download and sstate caches across all boards
+    DL_DIR = "${TOPDIR}/../downloads"
+    SSTATE_DIR = "${TOPDIR}/../sstate-cache"
+
+    # Enable debug-tweaks to allow root login without password
+    EXTRA_IMAGE_FEATURES += "debug-tweaks"
+
+    # Extra packages
+    CORE_IMAGE_EXTRA_INSTALL += "bcc-ptest bpftrace-ptest"
