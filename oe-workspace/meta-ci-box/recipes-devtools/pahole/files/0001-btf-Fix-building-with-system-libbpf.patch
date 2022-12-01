@@ -1,0 +1,43 @@
+From ce8ac05661e634daa2ecbcc0ef25db0f0e32a581 Mon Sep 17 00:00:00 2001
+From: Michal Wojcik <michal.wojcik@linaro.org>
+Date: Thu, 1 Dec 2022 08:25:31 +0100
+Subject: [PATCH] btf: Fix building with system libbpf
+
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/devel/pahole/pahole.git/commit/?id=2bb968b567011f8a3e47706dc11c2a6ec442352c]
+
+Where we may not have newer things, like BTF_KIND_ENUM64.
+So we're now again building with -DLIBBPF_EMBEDDED=Off.
+
+Signed-off-by: Arnaldo Carvalho de Melo <acme@redhat.com>
+Signed-off-by: Michal Wojcik <michal.wojcik@linaro.org>
+---
+ btf_encoder.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/btf_encoder.c b/btf_encoder.c
+index 1b4e83d..2ec83e5 100644
+--- a/btf_encoder.c
++++ b/btf_encoder.c
+@@ -9,12 +9,12 @@
+   Copyright (C) Red Hat Inc
+  */
+ 
++#include <linux/btf.h>
+ #include "dwarves.h"
+ #include "elf_symtab.h"
+ #include "btf_encoder.h"
+ #include "gobuffer.h"
+ 
+-#include <linux/btf.h>
+ #include <bpf/btf.h>
+ #include <bpf/libbpf.h>
+ #include <ctype.h> /* for isalpha() and isalnum() */
+@@ -123,7 +123,7 @@ static int btf_var_secinfo_cmp(const void *a, const void *b)
+ #define BITS_ROUNDDOWN_BYTES(bits) ((bits) >> 3)
+ #define BITS_ROUNDUP_BYTES(bits) (BITS_ROUNDDOWN_BYTES(bits) + !!BITS_PER_BYTE_MASKED(bits))
+ 
+-static const char * const btf_kind_str[NR_BTF_KINDS] = {
++static const char * const btf_kind_str[] = {
+ 	[BTF_KIND_UNKN]		= "UNKNOWN",
+ 	[BTF_KIND_INT]		= "INT",
+ 	[BTF_KIND_PTR]		= "PTR",
