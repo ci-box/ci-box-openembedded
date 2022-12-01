@@ -1,0 +1,61 @@
+device_type: qemu
+job_name: qemu arm64 openembedded ptest
+priority: medium
+visibility: public
+
+timeouts:
+  job:
+    minutes: 60
+  action:
+    minutes: 30
+  actions:
+    lava-test-shell:
+      minutes: 30
+  connection:
+    minutes: 30
+  connections:
+    lava-test-shell:
+      minutes: 30
+
+context:
+  arch: arm64
+  machine: virt
+  netdevice: user
+  cpu: cortex-a57
+  guestfs_interface: virtio
+  extra_options:
+  - -smp
+  - 1
+
+actions:
+- deploy:
+    to: tmpfs
+    os: oe
+    images:
+      kernel:
+        image_arg: -kernel {kernel}
+        url: http://fileserver/openembedded/${BRANCH}/Image-qemuarm64.bin.gz
+        compression: gz
+      rootfs:
+        image_arg: -drive format=raw,file={rootfs} --append 'root=/dev/vda'
+        url: http://fileserver/openembedded/${BRANCH}/core-image-minimal-qemuarm64.ext4.gz
+        compression: gz
+
+- boot:
+    method: qemu
+    media: tmpfs
+    auto_login:
+      login_prompt: "login:"
+      username: root
+    prompts:
+    - 'root@qemuarm64:~#'
+
+- test:
+    definitions:
+    - repository: https://github.com/Linaro/test-definitions.git
+      from: git
+      path: automated/linux/ptest/ptest.yaml
+      name: ptest
+      parameters:
+        PTEST_TIMEOUT: 1800
+        TESTS: "${TESTS}"
