@@ -1,5 +1,5 @@
 device_type: qemu
-job_name: qemu arm64 openembedded ptest
+job_name: "qemuarm64 poky/${BRANCH} ptest ${TESTS}"
 priority: medium
 visibility: public
 
