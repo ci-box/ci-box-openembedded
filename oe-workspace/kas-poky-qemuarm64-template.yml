@@ -52,4 +52,4 @@ local_conf_header:
     EXTRA_IMAGE_FEATURES += "debug-tweaks"
 
     # Extra packages
-    CORE_IMAGE_EXTRA_INSTALL += "bcc-ptest bpftrace-ptest"
+    CORE_IMAGE_EXTRA_INSTALL += "bcc-ptest bpftrace-ptest packagegroup-core-buildessential"
